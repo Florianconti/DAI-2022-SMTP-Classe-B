@@ -45,7 +45,7 @@ public class Prank {
     }
 
     public void setVictims(LinkedList<Person> victims) {
-        this.victims = victims
+        this.victims = victims;
     }
 
     private String getMailSender() {
