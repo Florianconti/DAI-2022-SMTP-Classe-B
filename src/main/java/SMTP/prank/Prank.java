@@ -1,71 +1,41 @@
 package SMTP.prank;
 
 import SMTP.mail.Person;
-import SMTP.mail.Mail;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Prank {
 
-    private LinkedList<Person> victims;
-    private final StringBuilder victimsNames = new StringBuilder();
+    private final List<Person> victims = new ArrayList<>();
     private Person sender;
     private String message;
-    private String subject;
 
-    private String getVictimsMail() {
-        StringBuilder str = new StringBuilder();
-        for (Person victim : victims) {
-            if (str.length() != 0) {
-                str.append(", ");
-                victimsNames.append(", ");
-            }
 
-            victimsNames.append(victim.getFirstName() + " " + victim.getLastName() + "<" + victim.getMail() + ">");
-            str.append("<" + victim.getMail() + ">");
-        }
-
-        return str.toString();
-    }
-
-    private String getvictimsName() {
-        return victimsNames.toString();
+    public void setSender(Person sender) {
+        this.sender = sender;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void addVictims(List<Person> victimList){
+        victims.addAll(victimList);
     }
 
-    public void setSender(Person sender) {
-        this.sender = sender;
-    }
+    public Message generateMailMessage(){
+        Message message = new Message();
 
-    public void setVictims(LinkedList<Person> victims) {
-        this.victims = victims;
-    }
+        message.setContent(this.message + "\r\n" + sender.getFirstName());
 
-    private String getMailSender() {
-        return "<" + sender.getMail() + ">";
-    }
+        String[] to = victims.stream().map(Person::getMail).collect(Collectors.toList()).toArray(new String[]{});
+        message.setTo(to);
 
-    private String getSenderName() {
-        return sender.getFirstName() + " " + sender.getLastName() + getMailSender();
-    }
+        message.setFrom(sender.getMail());
 
-    private String getMailMessage() {
         return message;
-    }
-
-    private String getMailSubject() {
-        return subject;
-    }
-
-    public Mail generateMail() {
-        return new Mail(getMailSender(), getSenderName(), getVictimsMail(), getvictimsName(), null, getMailSubject(), getMailMessage());
     }
 
 }
