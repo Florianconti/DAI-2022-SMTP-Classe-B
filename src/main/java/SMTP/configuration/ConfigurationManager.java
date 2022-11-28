@@ -2,32 +2,38 @@ package SMTP.configuration;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
 
 public class ConfigurationManager {
 
     private final String smtpServerAddress;
     private final int smtpServerPort;
-    private final boolean smtpAuth;
     private final int numberOfGroups;
-    private String smtpUsername;
-    private String smtpPassword;
+
+    String currentProjectFilePath = System.getProperty("user.dir");
+
+    String configFilePath   = currentProjectFilePath + "/config/config.properties";
+    String messagesFilePath = currentProjectFilePath + "/config/messages.utf8";
+    String victimsFilePath  = currentProjectFilePath + "/config/victims.utf8";
+
 
     public ConfigurationManager() throws IOException {
         Properties property = new Properties();
 
-        BufferedReader inputStream = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/config/config.properties", StandardCharsets.UTF_8));
+        BufferedReader br = new BufferedReader(new FileReader(configFilePath, StandardCharsets.UTF_8));
 
-        property.load(inputStream);
+        property.load(br);
 
         this.smtpServerAddress = property.getProperty("smtpServerAddress");
         this.smtpServerPort = Integer.parseInt(property.getProperty("smtpServerPort"));
         this.numberOfGroups = Integer.parseInt(property.getProperty("numberOfGroups"));
-        this.smtpAuth = Boolean.parseBoolean(property.getProperty("smtpAuth"));
-        if(smtpAuth) {
-            this.smtpUsername = property.getProperty("smtpUsername");
-            this.smtpPassword = property.getProperty("smtpPassword");
-        }
+    }
+
+    public int getNumberOfGroups() {
+        return numberOfGroups;
     }
 
     public String getSmtpServerAddress() {
@@ -36,14 +42,45 @@ public class ConfigurationManager {
 
     public int getSmtpServerPort() { return smtpServerPort;}
 
-    public boolean isSmtpAuthEnabled() { return smtpAuth; }
+    public List<String> getMailFromFile() {
+        List<String> emails = new ArrayList<>();
 
-    public String getSmtpUsername() {return smtpUsername; }
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(victimsFilePath));
 
-    public String getSmtpPassword() {return smtpPassword; }
+            String line;
+            while((line = br.readLine()) != null) {
+                emails.add(line);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
-    public int getNumberOfGroups() {
-        return numberOfGroups;
+        return emails;
+    }
+
+    public List<String> getMessagesFromFile() {
+        List<String> messages = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(messagesFilePath), StandardCharsets.UTF_8));
+
+            String line;
+            StringBuilder stringbuilder = new StringBuilder();
+
+            while((line = br.readLine()) != null) {
+                if(line.startsWith("------")) {
+                    messages.add(stringbuilder.toString());
+                    stringbuilder = new StringBuilder();
+                } else {
+                    stringbuilder.append(line).append("\n");
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return messages;
     }
 
 }
