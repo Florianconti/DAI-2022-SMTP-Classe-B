@@ -8,6 +8,11 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Florian Conti
+ * @author Patrick Furrer
+ * Class used to send the mails
+ */
 public class SmtpClient {
 
     private static final Logger LOG = Logger.getLogger(SmtpClient.class.getName());
@@ -19,12 +24,21 @@ public class SmtpClient {
     private BufferedReader in;
     private Socket socket;
 
+    /**
+     * Constructor of the smtpClient
+     * @param hostAddress Address of the SMTP server
+     * @param port Port of the SMTP server
+     */
     public SmtpClient(String hostAddress, int port) {
         this.hostAddress = hostAddress;
         this.serverPort = port;
     }
 
-    public void sendMail(Message message) throws IOException{
+    /**
+     * Method used to send the mail
+     * @param message The message to send
+     */
+    public void sendMail(Message message) {
         try {
             socket = new Socket(hostAddress, serverPort);
 
@@ -36,24 +50,30 @@ public class SmtpClient {
                 System.exit(-1);
             }
 
+            // Initiate the SMTP conversation
             out.printf("EHLO localhost\r\n");
             out.flush();
             String line = in.readLine();
             line = in.readLine();
 
+            // Check if smtp error
             if(!line.startsWith("250")){
                 throw new IOException("SMTP error: " + line);
             }
+
+            // Get the response of the server
             while(line.startsWith("250-")){
                 line = in.readLine();
             }
 
+            // MAIL FROM section
             out.write("MAIL FROM:");
             out.write(message.getFrom());
             out.write("\r\n");
             out.flush();
             line = in.readLine();
 
+            // RCPT TO section
             for(String to : message.getTo()){
                 out.write("RCPT TO:");
                 out.write(to);
@@ -62,24 +82,18 @@ public class SmtpClient {
                 line = in.readLine();
             }
 
-            if (message.getCc() != null) {
-                for(String to : message.getCc()){
-                    out.write("RCPT TO:");
-                    out.write(to);
-                    out.write("\r\n");
-                    out.flush();
-                    line = in.readLine();
-                }
-            }
-
+            // DATA section
             out.write("DATA");
             out.write("\r\n");
             out.flush();
             line = in.readLine();
 
             out.write("Content-Type: text/plain; charset=utf-8\r\n");
+
+            // Set from in data
             out.write("From: " + message.getFrom() + "\r\n");
 
+            // Set to in date
             out.write("To: " + message.getTo()[0]);
             for(int i = 1; i < message.getTo().length; i++){
                 out.write(", " + message.getTo()[i]);
@@ -95,6 +109,7 @@ public class SmtpClient {
             out.flush();
             line = in.readLine();
 
+            // Close the conversation
             out.write("QUIT\r\n");
             out.flush();
 

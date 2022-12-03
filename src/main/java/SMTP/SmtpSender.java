@@ -8,6 +8,11 @@ import SMTP.prank.Prank;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author Florian Conti
+ * @author Patrick Furrer
+ * Main class to generate and send the pranks
+ */
 public class SmtpSender
 {
     public static void main( String[] args) throws IOException {
