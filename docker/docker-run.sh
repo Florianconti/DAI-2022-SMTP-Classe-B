@@ -1,0 +1,1 @@
+docker run -d --rm --name mockmock -p 9999:25 -p 8282:8282 florianconti/mockmock
