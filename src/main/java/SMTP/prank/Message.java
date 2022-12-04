@@ -19,14 +19,6 @@ public class Message {
     }
 
     /**
-     * Set the email of the sender
-     * @param from the mail of the sender
-     */
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    /**
      * Getter of the mails of the victims
      * @return the mails of the victims
      */
@@ -35,19 +27,27 @@ public class Message {
     }
 
     /**
-     * Set the email of the victims
-     * @param to Array of the mails
-     */
-    public void setTo(String[] to) {
-        this.to = to;
-    }
-
-    /**
      * Getter of the content of the mail
      * @return the content of the mail
      */
     public String getContent() {
         return content;
+    }
+
+    /**
+     * Set the email of the sender
+     * @param from the mail of the sender
+     */
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    /**
+     * Set the email of the victims
+     * @param to Array of the mails
+     */
+    public void setTo(String[] to) {
+        this.to = to;
     }
 
     /**
